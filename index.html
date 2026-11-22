@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UPSC &amp; State PCS Study Tracker</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .tab-btn.active {
+      background-color: #4f46e5;
+      color: #ffffff;
+      box-shadow: 0 2px 6px rgba(79, 70, 229, 0.25);
+    }
+    .rev-pill.done {
+      background-color: #10b981;
+      color: #ffffff;
+      border-color: #10b981;
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#4f46e5" />
+  <link rel="icon" type="image/png" href="icon-192.png" />
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- Top Header -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shadow-sm">
+          <i data-lucide="book-open-check" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h1 id="header-exam-title" class="text-base sm:text-lg font-bold text-slate-900 leading-tight">UPSC / State PCS Tracker</h1>
+          <p id="header-subtitle" class="text-xs text-slate-500">Target: 15 Jan 2027 • 2.5 hrs/day</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <div id="header-countdown-pill" class="px-3 py-1.5 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-xs font-semibold flex items-center gap-1.5">
+          <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+          <span id="header-days-left">55 din baaki</span>
+        </div>
+        <button id="btn-open-settings" type="button" class="p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 transition" title="Settings &amp; Backup">
+          <i data-lucide="settings" class="w-5 h-5"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="max-w-6xl mx-auto px-4 sm:px-6 pb-2.5 flex items-center gap-2 overflow-x-auto no-scrollbar">
+      <button type="button" data-tab="dashboard" class="tab-btn active px-4 py-2 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition whitespace-nowrap flex items-center gap-2">
+        <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+        Dashboard
+      </button>
+      <button type="button" data-tab="syllabus" class="tab-btn px-4 py-2 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition whitespace-nowrap flex items-center gap-2">
+        <i data-lucide="list-checks" class="w-4 h-4"></i>
+        Syllabus &amp; Revision
+      </button>
+      <button type="button" data-tab="timer" class="tab-btn px-4 py-2 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition whitespace-nowrap flex items-center gap-2">
+        <i data-lucide="timer" class="w-4 h-4"></i>
+        Study Timer &amp; Log
+      </button>
+      <button type="button" data-tab="mocks" class="tab-btn px-4 py-2 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition whitespace-nowrap flex items-center gap-2">
+        <i data-lucide="award" class="w-4 h-4"></i>
+        Mock Tests
+      </button>
+    </nav>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-5 space-y-6">
+
+    <!-- VIEW 1: DASHBOARD -->
+    <section id="view-dashboard" class="space-y-6">
+      <!-- Top KPI Grid -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
+          <div class="flex items-center justify-between text-slate-500 text-xs font-medium mb-1">
+            <span>Samay Baaki Hai</span>
+            <i data-lucide="calendar" class="w-4 h-4 text-indigo-500"></i>
+          </div>
+          <div id="kpi-days-left" class="text-2xl sm:text-3xl font-extrabold text-slate-900">55 Days</div>
+          <p id="kpi-total-avail-hrs" class="text-xs text-slate-500 mt-1">137.5 total study hrs available</p>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
+          <div class="flex items-center justify-between text-slate-500 text-xs font-medium mb-1">
+            <span>Syllabus Complete</span>
+            <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-500"></i>
+          </div>
+          <div id="kpi-syllabus-pct" class="text-2xl sm:text-3xl font-extrabold text-emerald-600">0%</div>
+          <p id="kpi-syllabus-counts" class="text-xs text-slate-500 mt-1">0 / 30 topics done</p>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
+          <div class="flex items-center justify-between text-slate-500 text-xs font-medium mb-1">
+            <span>Daily Workload Target</span>
+            <i data-lucide="flame" class="w-4 h-4 text-amber-500"></i>
+          </div>
+          <div id="kpi-daily-pace" class="text-2xl sm:text-3xl font-extrabold text-amber-600">0.5 / day</div>
+          <p id="kpi-daily-hrs-needed" class="text-xs text-slate-500 mt-1">~2.0 hrs/day required</p>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
+          <div class="flex items-center justify-between text-slate-500 text-xs font-medium mb-1">
+            <span>Aaj ki Padhai</span>
+            <i data-lucide="clock-3" class="w-4 h-4 text-blue-500"></i>
+          </div>
+          <div id="kpi-today-hrs" class="text-2xl sm:text-3xl font-extrabold text-blue-600">0.0h</div>
+          <p id="kpi-today-goal" class="text-xs text-slate-500 mt-1">Target: 2.5h daily</p>
+        </div>
+      </div>
+
+      <!-- Progress Bar & Revision Summary -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
+          <div class="flex items-center justify-between">
+            <h2 class="text-base font-bold text-slate-900">Subject-wise Syllabus Progress</h2>
+            <button id="btn-dash-goto-syllabus" type="button" class="text-xs font-semibold text-indigo-600 hover:text-indigo-700">Manage Syllabus &rarr;</button>
+          </div>
+          <div class="relative h-64">
+            <canvas id="chart-subject-progress"></canvas>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm flex flex-col justify-between space-y-4">
+          <div>
+            <h2 class="text-base font-bold text-slate-900 mb-1">Aaj ka Study Goal &amp; Revision</h2>
+            <p class="text-xs text-slate-500">Kitna kar chuke aur kitna baaki hai</p>
+          </div>
+
+          <div class="space-y-3">
+            <div>
+              <div class="flex justify-between text-xs font-semibold mb-1">
+                <span class="text-slate-700">Today's Study Progress</span>
+                <span id="dash-today-pct" class="text-indigo-600">0%</span>
+              </div>
+              <div class="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                <div id="dash-today-bar" class="h-full bg-indigo-600 rounded-full transition-all duration-300" style="width: 0%"></div>
+              </div>
+            </div>
+
+            <div class="pt-2 border-t border-slate-100 space-y-2">
+              <div class="flex items-center justify-between text-xs">
+                <span class="text-slate-600 font-medium">1st Revision (R1)</span>
+                <span id="dash-r1-count" class="font-bold text-slate-800">0 / 30</span>
+              </div>
+              <div class="flex items-center justify-between text-xs">
+                <span class="text-slate-600 font-medium">2nd Revision (R2)</span>
+                <span id="dash-r2-count" class="font-bold text-slate-800">0 / 30</span>
+              </div>
+              <div class="flex items-center justify-between text-xs">
+                <span class="text-slate-600 font-medium">3rd Revision (R3)</span>
+                <span id="dash-r3-count" class="font-bold text-slate-800">0 / 30</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-3 border-t border-slate-100">
+            <div class="flex items-center justify-between text-xs text-slate-500 mb-2">
+              <span>Remaining Workload</span>
+              <span id="dash-rem-hrs" class="font-semibold text-slate-700">0 hrs left</span>
+            </div>
+            <button id="btn-dash-start-timer" type="button" class="w-full py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold transition flex items-center justify-center gap-2">
+              <i data-lucide="play" class="w-4 h-4"></i>
+              Start Focus Timer
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Today's Focus Queue -->
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+          <div>
+            <h2 class="text-base font-bold text-slate-900">Next Pending Topics (Aaj ke liye)</h2>
+            <p class="text-xs text-slate-500">Seedha tick karein ya timer start karein</p>
+          </div>
+          <span id="dash-pending-badge" class="px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-semibold">30 baaki</span>
+        </div>
+        <div id="dash-focus-list" class="divide-y divide-slate-100"></div>
+      </div>
+    </section>
+
+    <!-- VIEW 2: SYLLABUS & REVISION -->
+    <section id="view-syllabus" class="hidden space-y-5">
+      <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-sm space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 class="text-lg font-bold text-slate-900">Syllabus &amp; Revision Tracker</h2>
+            <p class="text-xs text-slate-500">Complete tick karein aur R1, R2, R3 revisions track karein</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button id="btn-open-add-subject" type="button" class="px-3.5 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-semibold transition flex items-center gap-1.5">
+              <i data-lucide="folder-plus" class="w-4 h-4"></i>
+              Add Subject
+            </button>
+            <button id="btn-open-add-topic" type="button" class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-semibold transition flex items-center gap-1.5">
+              <i data-lucide="plus" class="w-4 h-4"></i>
+              Add Topic
+            </button>
+          </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="flex flex-col sm:flex-row gap-3">
+          <div class="relative flex-1">
+            <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+            <input id="syllabus-search" type="text" placeholder="Topic ya subject search karein..." class="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          </div>
+          <select id="syllabus-filter-subject" class="px-3 py-2 rounded-xl border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <option value="ALL">All Subjects</option>
+          </select>
+          <select id="syllabus-filter-status" class="px-3 py-2 rounded-xl border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <option value="ALL">All Status</option>
+            <option value="PENDING">Pending Only</option>
+            <option value="COMPLETED">Completed Only</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="syllabus-groups-container" class="space-y-4"></div>
+    </section>
+
+    <!-- VIEW 3: STUDY TIMER & HOURS LOG -->
+    <section id="view-timer" class="hidden space-y-5">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <!-- Focus Timer Card -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm flex flex-col items-center text-center space-y-5">
+          <div class="w-full flex items-center justify-between">
+            <h2 class="text-base font-bold text-slate-900">Focus Study Timer</h2>
+            <div class="flex gap-1.5">
+              <button type="button" data-preset="25" class="preset-btn px-2.5 py-1 rounded-lg text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">25m</button>
+              <button type="button" data-preset="50" class="preset-btn px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">50m</button>
+              <button type="button" data-preset="15" class="preset-btn px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">15m</button>
+            </div>
+          </div>
+
+          <div class="w-48 h-48 rounded-full border-8 border-indigo-100 flex flex-col items-center justify-center bg-slate-50 shadow-inner">
+            <div id="timer-display" class="text-4xl font-extrabold text-slate-900 tabular-nums">25:00</div>
+            <div id="timer-status-label" class="text-xs text-slate-500 mt-1">Ready to focus</div>
+          </div>
+
+          <div class="w-full max-w-xs space-y-3">
+            <select id="timer-subject-select" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"></select>
+            <div class="flex items-center justify-center gap-2">
+              <button id="btn-timer-toggle" type="button" class="flex-1 py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold transition flex items-center justify-center gap-2">
+                <i data-lucide="play" class="w-4 h-4"></i>
+                Start
+              </button>
+              <button id="btn-timer-reset" type="button" class="py-2.5 px-3.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-sm font-semibold transition">
+                Reset
+              </button>
+            </div>
+            <button id="btn-timer-save" type="button" class="w-full py-2 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition">
+              Save Elapsed Time to Study Log
+            </button>
+          </div>
+        </div>
+
+        <!-- Manual Study Log + Weekly Chart -->
+        <div class="space-y-5">
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-3">
+            <h2 class="text-base font-bold text-slate-900">Manual Study Log Add Karein</h2>
+            <form id="form-manual-log" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-medium text-slate-600 mb-1">Subject</label>
+                <select id="log-subject" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm bg-white" required></select>
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-slate-600 mb-1">Date</label>
+                <input id="log-date" type="date" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm" required />
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-slate-600 mb-1">Minutes Studied</label>
+                <input id="log-minutes" type="number" min="5" max="720" value="60" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm" required />
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-slate-600 mb-1">Notes (Optional)</label>
+                <input id="log-notes" type="text" placeholder="e.g. Laxmikanth Ch 1-4" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm" />
+              </div>
+              <div class="sm:col-span-2">
+                <button type="submit" class="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold transition">
+                  Add Study Session
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+            <h2 class="text-base font-bold text-slate-900 mb-3">Last 7 Days Study Hours</h2>
+            <div class="relative h-52">
+              <canvas id="chart-weekly-hours"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Logs List -->
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+        <h2 class="text-base font-bold text-slate-900 mb-3">Recent Study Sessions</h2>
+        <div id="study-logs-list" class="divide-y divide-slate-100"></div>
+      </div>
+    </section>
+
+    <!-- VIEW 4: MOCK TESTS -->
+    <section id="view-mocks" class="hidden space-y-5">
+      <!-- Mock KPIs -->
+      <div class="grid grid-cols-3 gap-3 sm:gap-4">
+        <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
+          <div class="text-xs font-medium text-slate-500">Total Mock Tests</div>
+          <div id="mock-kpi-count" class="text-2xl font-extrabold text-slate-900 mt-1">0</div>
+        </div>
+        <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
+          <div class="text-xs font-medium text-slate-500">Average Score</div>
+          <div id="mock-kpi-avg" class="text-2xl font-extrabold text-indigo-600 mt-1">0%</div>
+        </div>
+        <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
+          <div class="text-xs font-medium text-slate-500">Best Score</div>
+          <div id="mock-kpi-best" class="text-2xl font-extrabold text-emerald-600 mt-1">0%</div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <!-- Add Mock Test Form -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-3">
+          <h2 class="text-base font-bold text-slate-900">Naya Mock Test Score Add Karein</h2>
+          <form id="form-mock-test" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="sm:col-span-2">
+              <label class="block text-xs font-medium text-slate-600 mb-1">Test Name</label>
+              <input id="mock-name" type="text" placeholder="e.g. GS Prelims Full Test 1" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm" required />
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-600 mb-1">Subject / Type</label>
+              <select id="mock-subject" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm bg-white"></select>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-600 mb-1">Date</label>
+              <input id="mock-date" type="date" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm" required />
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-600 mb-1">Marks Scored</label>
+              <input id="mock-scored" type="number" step="0.5" min="0" placeholder="112" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm" required />
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-600 mb-1">Total Marks</label>
+              <input id="mock-total" type="number" step="0.5" min="1" value="200" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm" required />
+            </div>
+            <div class="sm:col-span-2">
+              <label class="block text-xs font-medium text-slate-600 mb-1">Weak Areas / Notes</label>
+              <input id="mock-notes" type="text" placeholder="e.g. Revise Constitutional Bodies &amp; Environment Acts" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm" />
+            </div>
+            <div class="sm:col-span-2">
+              <button type="submit" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold transition">
+                Save Mock Test
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Score Trend Chart -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+          <h2 class="text-base font-bold text-slate-900 mb-3">Mock Score Trend (%)</h2>
+          <div class="relative h-64">
+            <canvas id="chart-mock-trend"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mock Test History -->
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+        <h2 class="text-base font-bold text-slate-900 mb-3">Mock Test History</h2>
+        <div id="mock-tests-list" class="divide-y divide-slate-100"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL: ADD SUBJECT -->
+  <div id="modal-add-subject" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-5 shadow-xl space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="text-base font-bold text-slate-900">Naya Subject Add Karein</h3>
+        <button type="button" data-close-modal="modal-add-subject" class="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <form id="form-add-subject" class="space-y-3">
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Subject Name</label>
+          <input id="new-subject-name" type="text" placeholder="e.g. Ethics (GS Paper IV)" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm" required />
+        </div>
+        <button type="submit" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold">Add Subject</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD TOPIC -->
+  <div id="modal-add-topic" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-5 shadow-xl space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="text-base font-bold text-slate-900">Naya Chapter / Topic Add Karein</h3>
+        <button type="button" data-close-modal="modal-add-topic" class="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <form id="form-add-topic" class="space-y-3">
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Subject</label>
+          <select id="new-topic-subject" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm bg-white" required></select>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Topic / Chapter Name</label>
+          <input id="new-topic-title" type="text" placeholder="e.g. Monetary Policy Committee" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm" required />
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Estimated Study Hours</label>
+          <input id="new-topic-hours" type="number" step="0.5" min="0.5" max="50" value="3" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm" required />
+        </div>
+        <button type="submit" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold">Add Topic</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: SETTINGS & BACKUP -->
+  <div id="modal-settings" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-5 shadow-xl space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between">
+        <h3 class="text-base font-bold text-slate-900">Exam Settings &amp; Data Backup</h3>
+        <button type="button" data-close-modal="modal-settings" class="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <form id="form-settings" class="space-y-3">
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Exam Name</label>
+          <input id="set-exam-name" type="text" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm" required />
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Target Exam Date</label>
+            <input id="set-exam-date" type="date" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm" required />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Daily Study Hours</label>
+            <input id="set-daily-hours" type="number" step="0.5" min="0.5" max="18" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm" required />
+          </div>
+        </div>
+        <button type="submit" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold">Save Settings</button>
+      </form>
+
+      <div class="pt-3 border-t border-slate-200 space-y-2">
+        <div class="text-xs font-bold text-slate-700">Backup &amp; Restore (Offline Storage)</div>
+        <div class="flex flex-wrap gap-2">
+          <button id="btn-export-json" type="button" class="flex-1 py-2 px-3 rounded-xl border border-slate-200 hover:bg-slate-50 text-xs font-semibold text-slate-700">
+            Export JSON Backup
+          </button>
+          <label class="flex-1 py-2 px-3 rounded-xl border border-slate-200 hover:bg-slate-50 text-xs font-semibold text-slate-700 text-center cursor-pointer">
+            Import JSON
+            <input id="input-import-json" type="file" accept=".json" class="hidden" />
+          </label>
+        </div>
+        <button id="btn-reset-data" type="button" class="w-full py-2 px-3 rounded-xl border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-semibold">
+          Reset All Data to Default UPSC Syllabus
+        </button>
+      </div>
+
+      <div class="p-3 rounded-xl bg-indigo-50 border border-indigo-100 text-xs text-indigo-900 space-y-1">
+        <div class="font-bold">Tablet par APK / App Install Guide:</div>
+        <p>1. GitHub Pages par is HTML file ko host karein (free).</p>
+        <p>2. Chrome mein kholkar <strong>Add to Home screen</strong> karein, ya <strong>PWABuilder.com</strong> par URL daalkar <strong>Android APK</strong> download karein.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CONFIRM RESET -->
+  <div id="modal-confirm-reset" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-xl space-y-4">
+      <h3 class="text-base font-bold text-slate-900">Data Reset Karein?</h3>
+      <p class="text-xs text-slate-600">Isse aapke saare logs, mock tests aur progress delete ho kar default UPSC syllabus load ho jayega.</p>
+      <div class="flex gap-2">
+        <button type="button" data-close-modal="modal-confirm-reset" class="flex-1 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700">Cancel</button>
+        <button id="btn-confirm-reset-yes" type="button" class="flex-1 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold">Yes, Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="hidden fixed bottom-5 right-5 z-50 px-4 py-2.5 rounded-xl bg-slate-900 text-white text-xs font-semibold shadow-lg transition-opacity"></div>
+
+  <script>
+    const STORAGE_KEY = 'upsc_study_tracker_v1';
+
+    function getDefaultDatePlusDays(days) {
+      const d = new Date();
+      d.setDate(d.getDate() + days);
+      return d.toISOString().split('T')[0];
+    }
+
+    function getTodayStr() {
+      return new Date().toISOString().split('T')[0];
+    }
+
+    function createDefaultState() {
+      return {
+        settings: {
+          examName: 'UPSC / State PCS Tracker',
+          targetDate: getDefaultDatePlusDays(55),
+          dailyHours: 2.5
+        },
+        subjects: [
+          { id: 'polity', name: 'Indian Polity & Governance' },
+          { id: 'history', name: 'History & Art/Culture' },
+          { id: 'geography', name: 'Geography' },
+          { id: 'economy', name: 'Indian Economy' },
+          { id: 'environment', name: 'Environment & Ecology' },
+          { id: 'scitech', name: 'Science & Technology' },
+          { id: 'csat', name: 'CSAT & Current Affairs' }
+        ],
+        topics: [
+          { id: 't1', subjectId: 'polity', title: 'Constitutional Framework & Amendments', estHours: 4, completed: false, r1: false, r2: false, r3: false },
+          { id: 't2', subjectId: 'polity', title: 'Fundamental Rights, DPSP & Duties', estHours: 4, completed: false, r1: false, r2: false, r3: false },
+          { id: 't3', subjectId: 'polity', title: 'Parliament & State Legislatures', estHours: 5, completed: false, r1: false, r2: false, r3: false },
+          { id: 't4', subjectId: 'polity', title: 'Executive & Judiciary', estHours: 4, completed: false, r1: false, r2: false, r3: false },
+          { id: 't5', subjectId: 'polity', title: 'Panchayati Raj & Urban Local Bodies', estHours: 2.5, completed: false, r1: false, r2: false, r3: false },
+          { id: 't6', subjectId: 'polity', title: 'Constitutional & Statutory Bodies', estHours: 3, completed: false, r1: false, r2: false, r3: false },
+
+          { id: 't7', subjectId: 'history', title: 'Ancient India & Indus Valley', estHours: 4, completed: false, r1: false, r2: false, r3: false },
+          { id: 't8', subjectId: 'history', title: 'Medieval India & Bhakti-Sufi', estHours: 4, completed: false, r1: false, r2: false, r3: false },
+          { id: 't9', subjectId: 'history', title: 'Modern India (1757-1947) & Freedom Struggle', estHours: 7, completed: false, r1: false, r2: false, r3: false },
+          { id: 't10', subjectId: 'history', title: 'Indian Art, Architecture & Literature', estHours: 4, completed: false, r1: false, r2: false, r3: false },
+          { id: 't11', subjectId: 'history', title: 'Post-Independence Consolidation', estHours: 2.5, completed: false, r1: false, r2: false, r3: false },
+
+          { id: 't12', subjectId: 'geography', title: 'Physical Geography (Geomorphology & Climatology)', estHours: 4.5, completed: false, r1: false, r2: false, r3: false },
+          { id: 't13', subjectId: 'geography', title: 'Indian Physiography & Drainage', estHours: 4, completed: false, r1: false, r2: false, r3: false },
+          { id: 't14', subjectId: 'geography', title: 'Monsoon, Soils & Natural Vegetation', estHours: 3, completed: false, r1: false, r2: false, r3: false },
+          { id: 't15', subjectId: 'geography', title: 'Economic & Human Geography', estHours: 3, completed: false, r1: false, r2: false, r3: false },
+
+          { id: 't16', subjectId: 'economy', title: 'National Income, Growth & Planning', estHours: 3.5, completed: false, r1: false, r2: false, r3: false },
+          { id: 't17', subjectId: 'economy', title: 'Banking, RBI & Monetary Policy', estHours: 4, completed: false, r1: false, r2: false, r3: false },
+          { id: 't18', subjectId: 'economy', title: 'Government Budgeting & Fiscal Policy', estHours: 3.5, completed: false, r1: false, r2: false, r3: false },
+          { id: 't19', subjectId: 'economy', title: 'Agriculture, Inclusive Growth & Poverty', estHours: 3.5, completed: false, r1: false, r2: false, r3: false },
+
+          { id: 't20', subjectId: 'environment', title: 'Ecosystems & Biodiversity', estHours: 3.5, completed: false, r1: false, r2: false, r3: false },
+          { id: 't21', subjectId: 'environment', title: 'Protected Areas (National Parks, Ramsar Sites)', estHours: 3, completed: false, r1: false, r2: false, r3: false },
+          { id: 't22', subjectId: 'environment', title: 'Climate Change & International Conventions', estHours: 3, completed: false, r1: false, r2: false, r3: false },
+          { id: 't23', subjectId: 'environment', title: 'Environmental Pollution & Acts', estHours: 2.5, completed: false, r1: false, r2: false, r3: false },
+
+          { id: 't24', subjectId: 'scitech', title: 'Space, Defence & Nuclear Tech', estHours: 3, completed: false, r1: false, r2: false, r3: false },
+          { id: 't25', subjectId: 'scitech', title: 'Biotechnology & Health', estHours: 3, completed: false, r1: false, r2: false, r3: false },
+          { id: 't26', subjectId: 'scitech', title: 'IT, AI & Emerging Tech', estHours: 2.5, completed: false, r1: false, r2: false, r3: false },
+
+          { id: 't27', subjectId: 'csat', title: 'Reading Comprehension Practice', estHours: 4, completed: false, r1: false, r2: false, r3: false },
+          { id: 't28', subjectId: 'csat', title: 'Quantitative Aptitude & Data Interpretation', estHours: 5, completed: false, r1: false, r2: false, r3: false },
+          { id: 't29', subjectId: 'csat', title: 'Logical Reasoning & Analytical Ability', estHours: 4, completed: false, r1: false, r2: false, r3: false },
+          { id: 't30', subjectId: 'csat', title: 'National & International Current Affairs', estHours: 8, completed: false, r1: false, r2: false, r3: false }
+        ],
+        studyLogs: [],
+        mockTests: []
+      };
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return createDefaultState();
+        const parsed = JSON.parse(raw);
+        if (!parsed || !parsed.settings || !Array.isArray(parsed.topics)) {
+          return createDefaultState();
+        }
+        return parsed;
+      } catch (e) {
+        return createDefaultState();
+      }
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) {
+        // Ignore storage quota errors in restricted contexts
+      }
+    }
+
+    let state = loadState();
+    let activeTab = 'dashboard';
+    let subjectChart = null;
+    let weeklyChart = null;
+    let mockChart = null;
+
+    // Timer state
+    let timerPresetMins = 25;
+    let timerSecondsLeft = 25 * 60;
+    let timerRunning = false;
+    let timerInterval = null;
+    let timerElapsedSeconds = 0;
+
+    function showToast(msg) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.remove('hidden');
+      clearTimeout(el._hideTimeout);
+      el._hideTimeout = setTimeout(() => {
+        el.classList.add('hidden');
+      }, 2500);
+    }
+
+    function getDaysRemaining() {
+      const today = new Date(getTodayStr() + 'T00:00:00');
+      const target = new Date(state.settings.targetDate + 'T00:00:00');
+      const diff = Math.ceil((target - today) / (1000 * 60 * 60 * 24));
+      return Math.max(0, isNaN(diff) ? 0 : diff);
+    }
+
+    function formatReadableDate(dateStr) {
+      if (!dateStr) return 'Not set';
+      const d = new Date(dateStr + 'T00:00:00');
+      if (isNaN(d.getTime())) return dateStr;
+      return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+    }
+
+    function getSubjectName(subjectId) {
+      const s = state.subjects.find(x => x.id === subjectId);
+      return s ? s.name : 'General';
+    }
+
+    function renderAll() {
+      renderHeader();
+      populateSubjectDropdowns();
+      if (activeTab === 'dashboard') renderDashboard();
+      if (activeTab === 'syllabus') renderSyllabus();
+      if (activeTab === 'timer') renderTimerView();
+      if (activeTab === 'mocks') renderMocksView();
+      if (window.lucide) {
+        window.lucide.createIcons();
+      }
+    }
+
+    function renderHeader() {
+      const daysLeft = getDaysRemaining();
+      document.getElementById('header-exam-title').textContent = state.settings.examName;
+      document.getElementById('header-subtitle').textContent =
+        `Target: ${formatReadableDate(state.settings.targetDate)} • ${state.settings.dailyHours} hrs/day`;
+      document.getElementById('header-days-left').textContent =
+        daysLeft === 0 ? 'Exam Day!' : `${daysLeft} din baaki`;
+    }
+
+    function populateSubjectDropdowns() {
+      const selects = [
+        { id: 'syllabus-filter-subject', includeAll: true },
+        { id: 'new-topic-subject', includeAll: false },
+        { id: 'timer-subject-select', includeAll: false },
+        { id: 'log-subject', includeAll: false },
+        { id: 'mock-subject', includeFullLength: true }
+      ];
+      selects.forEach(cfg => {
+        const el = document.getElementById(cfg.id);
+        if (!el) return;
+        const prev = el.value;
+        el.innerHTML = '';
+        if (cfg.includeAll) {
+          el.innerHTML += '<option value="ALL">All Subjects</option>';
+        }
+        if (cfg.includeFullLength) {
+          el.innerHTML += '<option value="Full Length GS">Full Length GS</option>';
+          el.innerHTML += '<option value="CSAT Mock">CSAT Mock</option>';
+        }
+        state.subjects.forEach(s => {
+          const opt = document.createElement('option');
+          opt.value = cfg.includeFullLength ? s.name : s.id;
+          opt.textContent = s.name;
+          el.appendChild(opt);
+        });
+        if (prev && Array.from(el.options).some(o => o.value === prev)) {
+          el.value = prev;
+        }
+      });
+    }
+
+    function renderDashboard() {
+      const daysLeft = getDaysRemaining();
+      const effectiveDays = Math.max(1, daysLeft);
+      const totalTopics = state.topics.length;
+      const completedTopics = state.topics.filter(t => t.completed).length;
+      const remainingTopics = totalTopics - completedTopics;
+      const pct = totalTopics > 0 ? Math.round((completedTopics / totalTopics) * 100) : 0;
+
+      const remainingEstHours = state.topics
+        .filter(t => !t.completed)
+        .reduce((sum, t) => sum + (Number(t.estHours) || 0), 0);
+
+      const totalAvailHours = (daysLeft * Number(state.settings.dailyHours || 0)).toFixed(1);
+      const dailyTopicsNeeded = (remainingTopics / effectiveDays).toFixed(1);
+      const dailyHoursNeeded = (remainingEstHours / effectiveDays).toFixed(1);
+
+      const todayStr = getTodayStr();
+      const todayMins = state.studyLogs
+        .filter(l => l.date === todayStr)
+        .reduce((sum, l) => sum + (Number(l.minutes) || 0), 0);
+      const todayHrs = (todayMins / 60);
+      const dailyGoalHrs = Math.max(0.5, Number(state.settings.dailyHours || 2.5));
+      const todayPct = Math.min(100, Math.round((todayHrs / dailyGoalHrs) * 100));
+
+      document.getElementById('kpi-days-left').textContent = `${daysLeft} Days`;
+      document.getElementById('kpi-total-avail-hrs').textContent = `${totalAvailHours} total study hrs available`;
+      document.getElementById('kpi-syllabus-pct').textContent = `${pct}%`;
+      document.getElementById('kpi-syllabus-counts').textContent = `${completedTopics} / ${totalTopics} topics done`;
+      document.getElementById('kpi-daily-pace').textContent = `${dailyTopicsNeeded} / day`;
+      document.getElementById('kpi-daily-hrs-needed').textContent = `~${dailyHoursNeeded} hrs/day required`;
+      document.getElementById('kpi-today-hrs').textContent = `${todayHrs.toFixed(1)}h`;
+      document.getElementById('kpi-today-goal').textContent = `Target: ${dailyGoalHrs}h daily`;
+
+      document.getElementById('dash-today-pct').textContent = `${todayPct}%`;
+      document.getElementById('dash-today-bar').style.width = `${todayPct}%`;
+
+      const r1Count = state.topics.filter(t => t.r1).length;
+      const r2Count = state.topics.filter(t => t.r2).length;
+      const r3Count = state.topics.filter(t => t.r3).length;
+      document.getElementById('dash-r1-count').textContent = `${r1Count} / ${totalTopics}`;
+      document.getElementById('dash-r2-count').textContent = `${r2Count} / ${totalTopics}`;
+      document.getElementById('dash-r3-count').textContent = `${r3Count} / ${totalTopics}`;
+      document.getElementById('dash-rem-hrs').textContent = `${remainingEstHours.toFixed(1)} hrs left`;
+      document.getElementById('dash-pending-badge').textContent = `${remainingTopics} baaki`;
+
+      // Pending Focus List
+      const focusContainer = document.getElementById('dash-focus-list');
+      const pending = state.topics.filter(t => !t.completed).slice(0, 5);
+      if (pending.length === 0) {
+        focusContainer.innerHTML = `<div class="py-6 text-center text-sm text-emerald-600 font-semibold">Shabaash! Saare topics complete ho gaye hain. Ab revisions aur mock tests par focus karein!</div>`;
+      } else {
+        focusContainer.innerHTML = pending.map(t => `
+          <div class="py-3 flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center gap-3 min-w-0">
+              <input type="checkbox" data-toggle-topic="${t.id}" class="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer" />
+              <div class="min-w-0">
+                <div class="text-sm font-semibold text-slate-800 truncate">${escapeHtml(t.title)}</div>
+                <div class="text-xs text-slate-500">${escapeHtml(getSubjectName(t.subjectId))} • ~${t.estHours}h</div>
+              </div>
+            </div>
+            <button type="button" data-focus-subject="${t.subjectId}" class="px-3 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold transition">
+              Study Now
+            </button>
+          </div>
+        `).join('');
+      }
+
+      // Subject Progress Chart
+      const labels = state.subjects.map(s => s.name.length > 18 ? s.name.slice(0, 16) + '...' : s.name);
+      const dataPcts = state.subjects.map(s => {
+        const list = state.topics.filter(t => t.subjectId === s.id);
+        if (list.length === 0) return 0;
+        const done = list.filter(t => t.completed).length;
+        return Math.round((done / list.length) * 100);
+      });
+
+      const ctx = document.getElementById('chart-subject-progress').getContext('2d');
+      if (subjectChart) subjectChart.destroy();
+      subjectChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Completed (%)',
+            data: dataPcts,
+            backgroundColor: '#4f46e5',
+            borderRadius: 6,
+            barThickness: 18
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: { min: 0, max: 100, ticks: { callback: v => v + '%' } },
+            y: { grid: { display: false } }
+          },
+          plugins: {
+            legend: { display: false }
+          }
+        }
+      });
+    }
+
+    function renderSyllabus() {
+      const query = (document.getElementById('syllabus-search').value || '').trim().toLowerCase();
+      const subjFilter = document.getElementById('syllabus-filter-subject').value;
+      const statusFilter = document.getElementById('syllabus-filter-status').value;
+      const container = document.getElementById('syllabus-groups-container');
+
+      const subjectsToShow = subjFilter === 'ALL'
+        ? state.subjects
+        : state.subjects.filter(s => s.id === subjFilter);
+
+      let html = '';
+      subjectsToShow.forEach(s => {
+        let topics = state.topics.filter(t => t.subjectId === s.id);
+        if (statusFilter === 'PENDING') topics = topics.filter(t => !t.completed);
+        if (statusFilter === 'COMPLETED') topics = topics.filter(t => t.completed);
+        if (query) {
+          topics = topics.filter(t =>
+            t.title.toLowerCase().includes(query) || s.name.toLowerCase().includes(query)
+          );
+        }
+
+        const allSubjTopics = state.topics.filter(t => t.subjectId === s.id);
+        const doneCount = allSubjTopics.filter(t => t.completed).length;
+        const pct = allSubjTopics.length ? Math.round((doneCount / allSubjTopics.length) * 100) : 0;
+
+        if (query && topics.length === 0) return;
+
+        html += `
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="px-4 sm:px-5 py-3.5 bg-slate-50 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <h3 class="text-sm sm:text-base font-bold text-slate-900">${escapeHtml(s.name)}</h3>
+                <p class="text-xs text-slate-500">${doneCount} / ${allSubjTopics.length} completed (${pct}%)</p>
+              </div>
+              <div class="w-28 h-2 bg-slate-200 rounded-full overflow-hidden">
+                <div class="h-full bg-emerald-500 rounded-full" style="width: ${pct}%"></div>
+              </div>
+            </div>
+            <div class="divide-y divide-slate-100">
+              ${topics.length === 0
+                ? '<div class="p-4 text-xs text-slate-500">Is filter mein koi topic nahi hai.</div>'
+                : topics.map(t => `
+                  <div class="px-4 sm:px-5 py-3 flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex items-start gap-3 min-w-0 flex-1">
+                      <input type="checkbox" data-toggle-topic="${t.id}" ${t.completed ? 'checked' : ''} class="mt-0.5 w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer" />
+                      <div class="min-w-0">
+                        <div class="text-sm font-medium ${t.completed ? 'line-through text-slate-400' : 'text-slate-800'}">${escapeHtml(t.title)}</div>
+                        <div class="text-xs text-slate-400">Est: ${t.estHours} hrs</div>
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                      <button type="button" data-rev="${t.id}:r1" class="rev-pill ${t.r1 ? 'done' : ''} px-2.5 py-1 rounded-lg border border-slate-200 text-xs font-semibold text-slate-600 transition">R1</button>
+                      <button type="button" data-rev="${t.id}:r2" class="rev-pill ${t.r2 ? 'done' : ''} px-2.5 py-1 rounded-lg border border-slate-200 text-xs font-semibold text-slate-600 transition">R2</button>
+                      <button type="button" data-rev="${t.id}:r3" class="rev-pill ${t.r3 ? 'done' : ''} px-2.5 py-1 rounded-lg border border-slate-200 text-xs font-semibold text-slate-600 transition">R3</button>
+                      <button type="button" data-delete-topic="${t.id}" class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition" title="Delete topic">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                      </button>
+                    </div>
+                  </div>
+                `).join('')
+              }
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html || '<div class="bg-white rounded-2xl border border-slate-200 p-8 text-center text-sm text-slate-500">Koi matching topic nahi mila.</div>';
+    }
+
+    function renderTimerView() {
+      updateTimerDisplay();
+      const logDateInput = document.getElementById('log-date');
+      if (!logDateInput.value) logDateInput.value = getTodayStr();
+
+      // Study logs list
+      const logsContainer = document.getElementById('study-logs-list');
+      const sorted = [...state.studyLogs].sort((a, b) => b.date.localeCompare(a.date));
+      if (sorted.length === 0) {
+        logsContainer.innerHTML = '<div class="py-6 text-center text-xs text-slate-500">Abhi tak koi study session log nahi hua hai. Timer chalayein ya manual log add karein!</div>';
+      } else {
+        logsContainer.innerHTML = sorted.slice(0, 20).map(l => `
+          <div class="py-3 flex items-center justify-between gap-3">
+            <div>
+              <div class="text-sm font-semibold text-slate-800">${escapeHtml(getSubjectName(l.subjectId))} • ${(l.minutes / 60).toFixed(2)} hrs (${l.minutes}m)</div>
+              <div class="text-xs text-slate-500">${formatReadableDate(l.date)}${l.notes ? ' • ' + escapeHtml(l.notes) : ''}</div>
+            </div>
+            <button type="button" data-delete-log="${l.id}" class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+          </div>
+        `).join('');
+      }
+
+      // Weekly Bar Chart
+      const days = [];
+      const hoursData = [];
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const key = d.toISOString().split('T')[0];
+        days.push(d.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric' }));
+        const mins = state.studyLogs.filter(l => l.date === key).reduce((s, l) => s + (Number(l.minutes) || 0), 0);
+        hoursData.push(Number((mins / 60).toFixed(2)));
+      }
+
+      const ctx = document.getElementById('chart-weekly-hours').getContext('2d');
+      if (weeklyChart) weeklyChart.destroy();
+      weeklyChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: days,
+          datasets: [{
+            label: 'Hours',
+            data: hoursData,
+            backgroundColor: '#3b82f6',
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: { beginAtZero: true, ticks: { callback: v => v + 'h' } },
+            x: { grid: { display: false } }
+          },
+          plugins: { legend: { display: false } }
+        }
+      });
+    }
+
+    function renderMocksView() {
+      const mockDateInput = document.getElementById('mock-date');
+      if (!mockDateInput.value) mockDateInput.value = getTodayStr();
+
+      const count = state.mockTests.length;
+      const pcts = state.mockTests.map(m => m.total > 0 ? (m.scored / m.total) * 100 : 0);
+      const avg = count > 0 ? (pcts.reduce((a, b) => a + b, 0) / count).toFixed(1) : '0';
+      const best = count > 0 ? Math.max(...pcts).toFixed(1) : '0';
+
+      document.getElementById('mock-kpi-count').textContent = count;
+      document.getElementById('mock-kpi-avg').textContent = `${avg}%`;
+      document.getElementById('mock-kpi-best').textContent = `${best}%`;
+
+      const listEl = document.getElementById('mock-tests-list');
+      const sorted = [...state.mockTests].sort((a, b) => b.date.localeCompare(a.date));
+      if (sorted.length === 0) {
+        listEl.innerHTML = '<div class="py-6 text-center text-xs text-slate-500">Abhi koi mock test record nahi hai. Pehla test score upar add karein!</div>';
+      } else {
+        listEl.innerHTML = sorted.map(m => {
+          const p = m.total > 0 ? ((m.scored / m.total) * 100).toFixed(1) : '0.0';
+          return `
+            <div class="py-3 flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <div class="text-sm font-semibold text-slate-800">${escapeHtml(m.name)} <span class="ml-1 px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 text-xs">${p}%</span></div>
+                <div class="text-xs text-slate-500">${escapeHtml(m.subject)} • ${formatReadableDate(m.date)} • ${m.scored}/${m.total}${m.notes ? ' • ' + escapeHtml(m.notes) : ''}</div>
+              </div>
+              <button type="button" data-delete-mock="${m.id}" class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
+            </div>
+          `;
+        }).join('');
+      }
+
+      const chron = [...state.mockTests].sort((a, b) => a.date.localeCompare(b.date));
+      const ctx = document.getElementById('chart-mock-trend').getContext('2d');
+      if (mockChart) mockChart.destroy();
+      mockChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: chron.length ? chron.map(m => m.name.slice(0, 12)) : ['No Tests'],
+          datasets: [{
+            label: 'Score %',
+            data: chron.length ? chron.map(m => m.total > 0 ? Number(((m.scored / m.total) * 100).toFixed(1)) : 0) : [0],
+            borderColor: '#10b981',
+            backgroundColor: 'rgba(16, 185, 129, 0.12)',
+            fill: true,
+            tension: 0.3
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: { min: 0, max: 100, ticks: { callback: v => v + '%' } }
+          },
+          plugins: { legend: { display: false } }
+        }
+      });
+    }
+
+    function updateTimerDisplay() {
+      const m = Math.floor(timerSecondsLeft / 60);
+      const s = timerSecondsLeft % 60;
+      document.getElementById('timer-display').textContent =
+        `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+      const toggleBtn = document.getElementById('btn-timer-toggle');
+      toggleBtn.innerHTML = timerRunning
+        ? '<i data-lucide="pause" class="w-4 h-4"></i> Pause'
+        : '<i data-lucide="play" class="w-4 h-4"></i> Start';
+      document.getElementById('timer-status-label').textContent = timerRunning
+        ? 'Focus session chal raha hai...'
+        : (timerElapsedSeconds > 0 ? `${Math.floor(timerElapsedSeconds / 60)}m ${timerElapsedSeconds % 60}s elapsed` : 'Ready to focus');
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    function switchTab(tabName) {
+      activeTab = tabName;
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tab === tabName);
+      });
+      ['dashboard', 'syllabus', 'timer', 'mocks'].forEach(v => {
+        document.getElementById('view-' + v).classList.toggle('hidden', v !== tabName);
+      });
+      renderAll();
+    }
+
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    // Event Listeners
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+    });
+
+    document.getElementById('btn-dash-goto-syllabus').addEventListener('click', () => switchTab('syllabus'));
+    document.getElementById('btn-dash-start-timer').addEventListener('click', () => switchTab('timer'));
+
+    // Event Delegation for dynamic lists
+    document.addEventListener('change', (e) => {
+      const toggleId = e.target.getAttribute('data-toggle-topic');
+      if (toggleId) {
+        const topic = state.topics.find(t => t.id === toggleId);
+        if (topic) {
+          topic.completed = e.target.checked;
+          saveState();
+          renderAll();
+          showToast(topic.completed ? 'Topic completed!' : 'Marked pending');
+        }
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      const revAttr = e.target.closest('[data-rev]')?.getAttribute('data-rev');
+      if (revAttr) {
+        const [tid, rKey] = revAttr.split(':');
+        const topic = state.topics.find(t => t.id === tid);
+        if (topic) {
+          topic[rKey] = !topic[rKey];
+          saveState();
+          renderAll();
+        }
+        return;
+      }
+
+      const delTopicId = e.target.closest('[data-delete-topic]')?.getAttribute('data-delete-topic');
+      if (delTopicId) {
+        state.topics = state.topics.filter(t => t.id !== delTopicId);
+        saveState();
+        renderAll();
+        showToast('Topic deleted');
+        return;
+      }
+
+      const delLogId = e.target.closest('[data-delete-log]')?.getAttribute('data-delete-log');
+      if (delLogId) {
+        state.studyLogs = state.studyLogs.filter(l => l.id !== delLogId);
+        saveState();
+        renderAll();
+        showToast('Study log removed');
+        return;
+      }
+
+      const delMockId = e.target.closest('[data-delete-mock]')?.getAttribute('data-delete-mock');
+      if (delMockId) {
+        state.mockTests = state.mockTests.filter(m => m.id !== delMockId);
+        saveState();
+        renderAll();
+        showToast('Mock test removed');
+        return;
+      }
+
+      const focusSubj = e.target.closest('[data-focus-subject]')?.getAttribute('data-focus-subject');
+      if (focusSubj) {
+        switchTab('timer');
+        const sel = document.getElementById('timer-subject-select');
+        if (sel) sel.value = focusSubj;
+        return;
+      }
+
+      const closeModalId = e.target.closest('[data-close-modal]')?.getAttribute('data-close-modal');
+      if (closeModalId) {
+        document.getElementById(closeModalId).classList.add('hidden');
+      }
+    });
+
+    // Syllabus Filters
+    document.getElementById('syllabus-search').addEventListener('input', renderSyllabus);
+    document.getElementById('syllabus-filter-subject').addEventListener('change', renderSyllabus);
+    document.getElementById('syllabus-filter-status').addEventListener('change', renderSyllabus);
+
+    // Modals open
+    document.getElementById('btn-open-add-subject').addEventListener('click', () => {
+      document.getElementById('modal-add-subject').classList.remove('hidden');
+    });
+    document.getElementById('btn-open-add-topic').addEventListener('click', () => {
+      populateSubjectDropdowns();
+      document.getElementById('modal-add-topic').classList.remove('hidden');
+    });
+    document.getElementById('btn-open-settings').addEventListener('click', () => {
+      document.getElementById('set-exam-name').value = state.settings.examName;
+      document.getElementById('set-exam-date').value = state.settings.targetDate;
+      document.getElementById('set-daily-hours').value = state.settings.dailyHours;
+      document.getElementById('modal-settings').classList.remove('hidden');
+    });
+
+    // Forms
+    document.getElementById('form-add-subject').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('new-subject-name').value.trim();
+      if (!name) return;
+      state.subjects.push({ id: 'subj_' + Date.now(), name });
+      saveState();
+      document.getElementById('new-subject-name').value = '';
+      document.getElementById('modal-add-subject').classList.add('hidden');
+      renderAll();
+      showToast('Subject added!');
+    });
+
+    document.getElementById('form-add-topic').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const subjectId = document.getElementById('new-topic-subject').value;
+      const title = document.getElementById('new-topic-title').value.trim();
+      const estHours = parseFloat(document.getElementById('new-topic-hours').value) || 2;
+      if (!title || !subjectId) return;
+      state.topics.push({
+        id: 't_' + Date.now(),
+        subjectId,
+        title,
+        estHours,
+        completed: false,
+        r1: false,
+        r2: false,
+        r3: false
+      });
+      saveState();
+      document.getElementById('new-topic-title').value = '';
+      document.getElementById('modal-add-topic').classList.add('hidden');
+      renderAll();
+      showToast('Topic added!');
+    });
+
+    document.getElementById('form-settings').addEventListener('submit', (e) => {
+      e.preventDefault();
+      state.settings.examName = document.getElementById('set-exam-name').value.trim() || 'UPSC / State PCS Tracker';
+      state.settings.targetDate = document.getElementById('set-exam-date').value || getDefaultDatePlusDays(55);
+      state.settings.dailyHours = parseFloat(document.getElementById('set-daily-hours').value) || 2.5;
+      saveState();
+      document.getElementById('modal-settings').classList.add('hidden');
+      renderAll();
+      showToast('Settings saved!');
+    });
+
+    // Timer controls
+    document.querySelectorAll('.preset-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        clearInterval(timerInterval);
+        timerRunning = false;
+        timerPresetMins = parseInt(btn.dataset.preset, 10) || 25;
+        timerSecondsLeft = timerPresetMins * 60;
+        timerElapsedSeconds = 0;
+        document.querySelectorAll('.preset-btn').forEach(b => {
+          b.className = b === btn
+            ? 'preset-btn px-2.5 py-1 rounded-lg text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200'
+            : 'preset-btn px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200';
+        });
+        updateTimerDisplay();
+      });
+    });
+
+    document.getElementById('btn-timer-toggle').addEventListener('click', () => {
+      if (timerRunning) {
+        clearInterval(timerInterval);
+        timerRunning = false;
+        updateTimerDisplay();
+      } else {
+        clearInterval(timerInterval);
+        timerRunning = true;
+        updateTimerDisplay();
+        timerInterval = setInterval(() => {
+          if (timerSecondsLeft > 0) {
+            timerSecondsLeft--;
+            timerElapsedSeconds++;
+            updateTimerDisplay();
+          } else {
+            clearInterval(timerInterval);
+            timerRunning = false;
+            updateTimerDisplay();
+            showToast('Focus session complete! Save karne ke liye button dabayein.');
+          }
+        }, 1000);
+      }
+    });
+
+    document.getElementById('btn-timer-reset').addEventListener('click', () => {
+      clearInterval(timerInterval);
+      timerRunning = false;
+      timerSecondsLeft = timerPresetMins * 60;
+      timerElapsedSeconds = 0;
+      updateTimerDisplay();
+    });
+
+    document.getElementById('btn-timer-save').addEventListener('click', () => {
+      const mins = Math.max(1, Math.round(timerElapsedSeconds / 60));
+      if (timerElapsedSeconds < 10) {
+        showToast('Kam se kam 10 seconds focus karein ya manual log use karein.');
+        return;
+      }
+      const subjectId = document.getElementById('timer-subject-select').value || state.subjects[0]?.id || 'polity';
+      state.studyLogs.push({
+        id: 'log_' + Date.now(),
+        subjectId,
+        date: getTodayStr(),
+        minutes: mins,
+        notes: 'Focus Timer Session'
+      });
+      clearInterval(timerInterval);
+      timerRunning = false;
+      timerSecondsLeft = timerPresetMins * 60;
+      timerElapsedSeconds = 0;
+      saveState();
+      renderAll();
+      showToast(`${mins} minutes study log mein save ho gaya!`);
+    });
+
+    // Manual Study Log
+    document.getElementById('form-manual-log').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const subjectId = document.getElementById('log-subject').value;
+      const date = document.getElementById('log-date').value || getTodayStr();
+      const minutes = parseInt(document.getElementById('log-minutes').value, 10) || 0;
+      const notes = document.getElementById('log-notes').value.trim();
+      if (minutes <= 0) return;
+      state.studyLogs.push({ id: 'log_' + Date.now(), subjectId, date, minutes, notes });
+      saveState();
+      document.getElementById('log-notes').value = '';
+      renderAll();
+      showToast('Study session logged!');
+    });
+
+    // Mock Test Form
+    document.getElementById('form-mock-test').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('mock-name').value.trim();
+      const subject = document.getElementById('mock-subject').value;
+      const date = document.getElementById('mock-date').value || getTodayStr();
+      const scored = parseFloat(document.getElementById('mock-scored').value) || 0;
+      const total = Math.max(1, parseFloat(document.getElementById('mock-total').value) || 200);
+      const notes = document.getElementById('mock-notes').value.trim();
+      if (!name) return;
+      state.mockTests.push({ id: 'mock_' + Date.now(), name, subject, date, scored, total, notes });
+      saveState();
+      document.getElementById('mock-name').value = '';
+      document.getElementById('mock-scored').value = '';
+      document.getElementById('mock-notes').value = '';
+      renderAll();
+      showToast('Mock test saved!');
+    });
+
+    // Backup / Reset
+    document.getElementById('btn-export-json').addEventListener('click', () => {
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `upsc_tracker_backup_${getTodayStr()}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('Backup JSON downloaded!');
+    });
+
+    document.getElementById('input-import-json').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        try {
+          const imported = JSON.parse(evt.target.result);
+          if (imported && imported.settings && Array.isArray(imported.topics)) {
+            state = imported;
+            saveState();
+            renderAll();
+            document.getElementById('modal-settings').classList.add('hidden');
+            showToast('Backup restored successfully!');
+          } else {
+            showToast('Invalid backup file format.');
+          }
+        } catch (err) {
+          showToast('Could not read JSON file.');
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    document.getElementById('btn-reset-data').addEventListener('click', () => {
+      document.getElementById('modal-confirm-reset').classList.remove('hidden');
+    });
+
+    document.getElementById('btn-confirm-reset-yes').addEventListener('click', () => {
+      state = createDefaultState();
+      saveState();
+      document.getElementById('modal-confirm-reset').classList.add('hidden');
+      document.getElementById('modal-settings').classList.add('hidden');
+      renderAll();
+      showToast('Reset to default UPSC syllabus!');
+    });
+
+    // Init
+    renderAll();
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>
